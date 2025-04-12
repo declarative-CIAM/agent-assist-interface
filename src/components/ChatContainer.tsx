@@ -1,9 +1,12 @@
-
 import { useRef, useEffect, useState } from "react";
 import ChatMessage, { MessageProps } from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import ChatHeader from "./ChatHeader";
 import TypingIndicator from "./TypingIndicator";
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { MessageSquare, MessageCircle, Clock, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const initialMessages: MessageProps[] = [
   {
@@ -17,6 +20,8 @@ const initialMessages: MessageProps[] = [
 const ChatContainer = () => {
   const [messages, setMessages] = useState<MessageProps[]>(initialMessages);
   const [isTyping, setIsTyping] = useState(false);
+  const [isFastMode, setIsFastMode] = useState(false);
+  const [chatStyle, setChatStyle] = useState<"bubble" | "modern">("bubble");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -63,14 +68,54 @@ const ChatContainer = () => {
       };
       
       setMessages((prev) => [...prev, aiMessage]);
-    }, 1500);
+    }, isFastMode ? 500 : 1500);
+  };
+
+  const handleClearChat = () => {
+    setMessages(initialMessages);
   };
 
   return (
     <div className="flex flex-col h-full bg-chat-background">
       <ChatHeader agentName="AI Assistant" />
       
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="p-2 border-b flex justify-between items-center bg-white">
+        <ToggleGroup type="single" value={chatStyle} onValueChange={(value) => value && setChatStyle(value as "bubble" | "modern")}>
+          <ToggleGroupItem value="bubble" aria-label="Bubble Style">
+            <MessageCircle className="h-4 w-4 mr-1" />
+            Bubble
+          </ToggleGroupItem>
+          <ToggleGroupItem value="modern" aria-label="Modern Style">
+            <MessageSquare className="h-4 w-4 mr-1" />
+            Modern
+          </ToggleGroupItem>
+        </ToggleGroup>
+        
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-xs flex items-center gap-1"
+            onClick={() => setIsFastMode(!isFastMode)}
+          >
+            <Clock className="h-3 w-3" />
+            {isFastMode ? "Normal Mode" : "Fast Mode"}
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={handleClearChat}
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+      
+      <div className={cn(
+        "flex-1 overflow-y-auto p-4",
+        chatStyle === "modern" ? "bg-gray-50" : "bg-chat-background"
+      )}>
         {messages.map((message) => (
           <ChatMessage
             key={message.id}
@@ -78,6 +123,7 @@ const ChatContainer = () => {
             content={message.content}
             sender={message.sender}
             timestamp={message.timestamp}
+            reaction={message.reaction}
           />
         ))}
         
