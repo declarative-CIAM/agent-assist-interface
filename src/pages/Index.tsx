@@ -1,12 +1,13 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { Card } from "@/components/ui/card";
+import ChatContainer from "@/components/ChatContainer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8 flex items-center justify-center">
+      <Card className="w-full max-w-3xl h-[600px] shadow-lg overflow-hidden flex flex-col">
+        <ChatContainer />
+      </Card>
     </div>
   );
 };
